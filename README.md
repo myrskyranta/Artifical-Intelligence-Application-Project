@@ -1,27 +1,27 @@
-# Project name
+# StudyBuddy AI
 
 Starter template for the **Development of AI Applications** course final group project.
 
 ## Team members
 
-- Member 1 Name (email@example.com)
-- Member 2 Name (email@example.com)
-- Member 3 Name (email@example.com)
+- Emmi Myrskyranta (emmi.myrskyranta@student.hamk.fi)
+- Md Firoz Chowdhury (mdfirozchowdhury@student.hamk.fi)
+- Bishnu Chaudhary (bishnu.chaudhary@student.hamk.fi)
 
 ## Problem
 
 ### Intended users
-Who are the primary target users of this application?
+Students of Häme University of Applied Sciences.
 
 ### Problem statement
-What specific problem does this application solve for those users?
+Students face a lot of scheduling conflicts in their studies due to a large amount of projects, assignments and materials to study. Manually making flashcards, practice quizzes and summaries for one's studies takes away hours that the student could use more efficiently. 
 
 ### Why AI is appropriate
 Why does this problem require AI / LLM capabilities rather than traditional deterministic software?
 
 ## Solution
 
-Briefly describe your application, its primary value proposition, and how it addresses the problem statement above.
+StudyBuddy AI addresses the challenges stated above by providing a centralized studying assistant. It combies Retrieval-Augmented Generation (RAG) and user-friendly interface and allows students to upload their course materials and instantly generate accurate explanations, practice quizzes as well as interactive flashcards. This reduces preparation time significantly and improves retention.
 
 ## Main user workflow
 
@@ -65,7 +65,7 @@ Select at least one additional capability to implement for your final project:
 - [ ] Other: ______________________
 
 ### Capability justification
-Explain why the selected capability is useful and necessary for your application's user problem.
+Retrieval-Augmented Generation (RAG) is useful in this project because it directly solves the core limitations of standard AI when applied to academics. For example, it eliminates the risk of hallucination with source grounding. RAG retrieves exact exerpts from the materials that the user has uploaded and then feeds those excerpts to the AI as context. This then forces the model to answer using only the verified materials, ensuring factual accurary.
 
 ## Setup
 
