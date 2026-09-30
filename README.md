@@ -21,7 +21,7 @@ This project requires AI and LLM's (Large Language Models) because studying is s
 
 ## Solution
 
-StudyBuddy AI addresses the challenges stated above by providing a centralized studying assistant. It combies Retrieval-Augmented Generation (RAG) and user-friendly interface and allows students to upload their course materials and instantly generate accurate explanations, practice quizzes as well as interactive flashcards. This reduces preparation time significantly and improves retention.
+StudyBuddy AI addresses the challenges stated above by providing a centralized studying assistant. It combines Retrieval-Augmented Generation (RAG) and user-friendly interface and allows students to upload their course materials and instantly generate accurate explanations, practice quizzes as well as interactive flashcards. This reduces preparation time significantly and improves retention.
 
 ## Main user workflow
 
@@ -65,7 +65,7 @@ Select at least one additional capability to implement for your final project:
 - [ ] Other: ______________________
 
 ### Capability justification
-Retrieval-Augmented Generation (RAG) is useful in this project because it directly solves the core limitations of standard AI when applied to academics. For example, it eliminates the risk of hallucination with source grounding. RAG retrieves exact exerpts from the materials that the user has uploaded and then feeds those excerpts to the AI as context. This then forces the model to answer using only the verified materials, ensuring factual accurary.
+Retrieval-Augmented Generation (RAG) is useful in this project because it directly solves the core limitations of standard AI when applied to academics. For example, it eliminates the risk of hallucination with source grounding. RAG retrieves exact excerpts from the materials that the user has uploaded and then feeds those excerpts to the AI as context. This then forces the model to answer using only the verified materials, ensuring factual accuracy.
 
 ## Setup
 
