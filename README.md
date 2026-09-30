@@ -5,7 +5,7 @@ Starter template for the **Development of AI Applications** course final group p
 ## Team members
 
 - Emmi Myrskyranta (emmi.myrskyranta@student.hamk.fi)
-- Md Firoz Chowdhury (mdfirozchowdhury@student.hamk.fi)
+- Md Firoz Chowdhury (mdfiroz.chowdhury@student.hamk.fi)
 - Bishnu Chaudhary (bishnu.chaudhary@student.hamk.fi)
 
 ## Problem
