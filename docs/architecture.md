@@ -9,9 +9,9 @@ The starter application follows a clean layered separation of concerns:
 ```text
 User
   ↓
-Gradio UI (app/ui.py)
+Gradio UI (app/ui.py) ── uploads ──> Document parser and lexical index
   ↓
-Application / AI Service (src/services/ai_service.py)
+Application / AI Service (src/services/ai_service.py) <── retrieved chunks
   ↓
 Model Client (src/models/model_client.py)
   ↓
@@ -28,15 +28,18 @@ Local Model (e.g., llama3.2)
 
 ---
 
-## Extension Points for Course Projects
+## Uploaded study materials (RAG)
 
-As your project team designs and implements your additional AI capability, extend this baseline architecture. Potential capability extensions include:
+The UI accepts TXT, Markdown, PDF, and DOCX materials. The RAG capability in `src/capabilities/rag.py` extracts text, chunks it, and ranks chunks with local lexical retrieval. The selected excerpts and their source labels are passed to the AI service, which adds grounding instructions before calling the model. The in-memory index is scoped to the active Gradio session; scanned PDFs require OCR and are not supported.
 
-- **RAG (Retrieval-Augmented Generation):** Insert document parsing, chunking, vector embeddings, and vector database retrieval into the service layer to ground model responses in domain documents.
+Conversation turns are kept in the Gradio chat session so quiz answers can be evaluated in context. The model is instructed to treat document content as reference material rather than as instructions. Grounding reduces unsupported answers but does not guarantee correctness.
+
+## Further extension points
+
+Other capabilities can be added later:
+
 - **Tools & External APIs:** Integrate tool execution functions into the service layer allowing the model to query web services or local python utilities.
 - **Model Context Protocol (MCP):** Connect your service layer to standard MCP servers to access external tools and context providers.
 - **Agent Workflows:** Implement observation-action loops controlled by application code to handle dynamic multi-step tasks.
-- **Memory & Conversation State:** Store session history or persistent state across user interactions.
+- **Persistent Memory:** Store approved session history or study progress across application restarts.
 - **Multimodal Models:** Update the model client and UI payload to pass image data to vision-enabled local models.
-
-> **Instruction:** Replace or update the architecture diagram in this file as your team implements new components.

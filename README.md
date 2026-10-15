@@ -21,24 +21,25 @@ This project requires AI and LLM's (Large Language Models) because studying is s
 
 ## Solution
 
-StudyBuddy AI addresses the challenges stated above by providing a centralized studying assistant. It combines Retrieval-Augmented Generation (RAG) and user-friendly interface and allows students to upload their course materials and instantly generate accurate explanations, practice quizzes as well as interactive flashcards. This reduces preparation time significantly and improves retention.
+StudyBuddy AI addresses the challenges stated above by providing a study assistant where students can upload course materials and request source-grounded explanations, interactive quizzes, summaries, and flashcards. This reduces preparation time while keeping answers tied to the student's own material.
 
 ## Main user workflow
 
-1. **User Input:** The user submits a prompt or query via the Gradio user interface.
-2. **Processing & Guardrails:** The application service layer (`src/services/ai_service.py`) validates and formats the request.
-3. **Model Response:** The model client calls Ollama locally and returns the response back through the service layer to the UI.
+1. **Upload:** The user adds TXT, Markdown, PDF, or DOCX course material in the Gradio interface.
+2. **Retrieve:** The application extracts and indexes the document text, then selects relevant excerpts for each question.
+3. **Study:** The user chooses a mode, such as Quiz me, and continues in a chat session.
+4. **Respond:** The service layer grounds the prompt in retrieved excerpts; the Ollama model generates a response with source references.
 
 ## Architecture
 
-Below is the initial starter architecture. As your project evolves with additional capabilities, replace or extend this diagram in [`docs/architecture.md`](docs/architecture.md).
+The document retrieval path augments the baseline architecture:
 
 ```text
 User
   ↓
-Gradio UI (app/ui.py)
+Gradio UI (app/ui.py) ── upload ──> Document parsing and lexical retrieval
   ↓
-Application / AI Service (src/services/ai_service.py)
+Application / AI Service (src/services/ai_service.py) <── source excerpts
   ↓
 Model Client (src/models/model_client.py)
   ↓
@@ -56,7 +57,7 @@ Ollama (Local LLM Server)
 
 Select at least one additional capability to implement for your final project:
 
-- [ ] RAG (Retrieval-Augmented Generation)
+- [x] RAG (Retrieval-Augmented Generation)
 - [ ] Tools / External API integration
 - [ ] Model Context Protocol (MCP)
 - [ ] Agentic workflow (Model-selected actions based on observations)
@@ -65,7 +66,9 @@ Select at least one additional capability to implement for your final project:
 - [ ] Other: ______________________
 
 ### Capability justification
-Retrieval-Augmented Generation (RAG) is useful in this project because it directly solves the core limitations of standard AI when applied to academics. For example, it eliminates the risk of hallucination with source grounding. RAG retrieves exact excerpts from the materials that the user has uploaded and then feeds those excerpts to the AI as context. This then forces the model to answer using only the verified materials, ensuring factual accuracy.
+StudyBuddy implements lightweight RAG for uploaded course materials. It extracts and chunks text from TXT, Markdown, PDF, and DOCX files, ranks relevant chunks for each request, and passes them to the model through the AI service with source labels and grounding instructions. This encourages document-based answers but cannot eliminate hallucinations, so students should verify important information against the cited material.
+
+Uploads are held for the active Gradio session and are not saved to a project database. Scanned PDFs without selectable text are not supported because OCR is not included.
 
 ## Setup
 
