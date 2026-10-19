@@ -1,5 +1,6 @@
 import gradio as gr
-from src.services.ai_service import STUDY_MODES, generate_study_response
+from src.capabilities.rag import DocumentLibrary, DocumentProcessingError
+from src.services.ai_service import STUDY_MODES, generate_response
 
 
 STUDY_THEME = gr.themes.Soft(
@@ -199,21 +200,95 @@ footer { display: none !important; }
 }
 """
 
+MODE_DESCRIPTIONS = {
+    "Study chat": "Ask a question and get a clear explanation tailored to your level.",
+    "Explain a concept": "Break a difficult idea into steps and see it in a simple example.",
+    "Quiz me": "Answer one question at a time; I’ll check your answer against the uploaded notes.",
+    "Summarize": "Turn a longer passage into concise notes and key takeaways.",
+    "Make flashcards": "Create question-and-answer cards to help you review.",
+}
 
-def _respond(prompt: str, study_mode: str) -> str:
-    """Delegate the study request to the application service."""
+WELCOME_MESSAGE = (
+    "Hi! Upload some course material, choose a study mode, and ask me to explain, "
+    "summarize, or quiz you on it."
+)
+
+
+def _respond(
+    prompt: str,
+    study_mode: str,
+    document_library: DocumentLibrary | None = None,
+    history: list[dict[str, str]] | None = None,
+) -> tuple[list[dict[str, str]], str]:
+    """Add study-mode guidance and delegate the request to the AI service."""
+    conversation = list(history or [])
     if not prompt or not prompt.strip():
-        return "Add a question or some study material above to get started."
-    return generate_study_response(prompt, study_mode)
+        return conversation, ""
+
+    instruction = STUDY_MODES.get(study_mode, STUDY_MODES["Study chat"])
+    recent_turns = conversation[-8:]
+    prior_context = "\n".join(
+        f"{message.get('role', 'assistant').title()}: {message.get('content', '')}"
+        for message in recent_turns
+        if isinstance(message.get("content"), str)
+    )
+    request = f"{instruction}\n\n"
+    if prior_context:
+        request += (
+            "Continue this study conversation and use the previous turns for context. "
+            "For quizzes, remember the question asked, assess the student's latest answer, "
+            "and then continue with a new question.\n"
+            f"Previous turns:\n{prior_context}\n\n"
+        )
+    request += f"Student's latest request:\n{prompt.strip()}"
+    context = document_library.retrieve(f"{prompt}\n{prior_context}") if document_library else None
+    answer = generate_response(request, context=context)
+    conversation.extend(
+        [
+            {"role": "user", "content": prompt.strip()},
+            {"role": "assistant", "content": answer},
+        ]
+    )
+    return conversation, ""
+
+
+def _clear_session() -> tuple[str, list[dict[str, str]]]:
+    """Clear the current prompt and chat while leaving uploaded materials intact."""
+    return "", [{"role": "assistant", "content": WELCOME_MESSAGE}]
+
+
+def _load_materials(files) -> tuple[str, DocumentLibrary | None]:
+    """Build a session-local searchable index from the selected upload paths."""
+    if not files:
+        return "No documents uploaded yet. Add course notes to ground your study session.", None
+
+    if isinstance(files, str):
+        files = [files]
+    try:
+        library = DocumentLibrary.from_files(files)
+    except DocumentProcessingError as err:
+        return f"⚠️ {err}", None
+
+    names = ", ".join(library.document_names)
+    return (
+        f"✅ Loaded {len(library.document_names)} document(s) · {len(library.chunks)} searchable sections\n\n"
+        f"{names}",
+        library,
+    )
+
+
+def _mode_description(study_mode: str) -> str:
+    """Return a short explanation of the selected study mode."""
+    return MODE_DESCRIPTIONS.get(study_mode, MODE_DESCRIPTIONS["Study chat"])
+
+
+def ui_launch_options() -> dict[str, object]:
+    """Return the botanical theme and CSS through Gradio's launch options."""
+    return {"theme": STUDY_THEME, "css": STUDY_CSS}
 
 
 def build_ui() -> gr.Blocks:
-    """
-    Constructs the Gradio web interface.
-    
-    Architectural Principle: The UI communicates strictly with `generate_response()`
-    in the AI service layer and never directly with Ollama or the model client.
-    """
+    """Construct the study UI; model requests remain behind the application service."""
     with gr.Blocks(
         title="StudyBuddy AI | Your study space",
         elem_id="study-buddy",
@@ -222,7 +297,7 @@ def build_ui() -> gr.Blocks:
             """
             # 🌿 StudyBuddy AI
 
-            Your calm, focused space to understand more and study smarter.
+            A calm space to understand your course material and study smarter.
             """,
             elem_id="study-header",
         )
@@ -246,17 +321,37 @@ def build_ui() -> gr.Blocks:
                         label="Study mode",
                         interactive=True,
                     )
+                    mode_help = gr.Markdown(
+                        MODE_DESCRIPTIONS["Study chat"],
+                        elem_id="mode-help",
+                        elem_classes=["study-note"],
+                    )
 
                 with gr.Group(elem_classes=["study-card"]):
                     gr.Markdown("### 📚 Course library")
                     gr.Markdown(
-                        "Paste your course notes or a passage into the study box. "
-                        "The selected model runs locally through Ollama; this version "
-                        "does not store or retrieve uploaded course files.",
+                        "Upload course notes to ground study answers, or paste a passage "
+                        "directly into the study box.",
+                        elem_classes=["study-note"],
+                    )
+                    study_files = gr.File(
+                        label="Course materials",
+                        file_count="multiple",
+                        file_types=[".txt", ".md", ".pdf", ".docx"],
+                        type="filepath",
+                    )
+                    document_status = gr.Markdown(
+                        "No documents uploaded yet. Add course notes to ground your study session.",
+                        elem_classes=["study-note"],
+                    )
+                    document_library = gr.State(value=None)
+                    gr.Markdown(
+                        "Supported: TXT, Markdown, PDF, DOCX · Up to 8 files, 20 MB each. "
+                        "Scanned PDFs need selectable text (OCR is not included).",
                         elem_classes=["study-note"],
                     )
                     gr.Markdown(
-                        "**Tip:** Include the relevant notes for grounded answers.",
+                        "🔒 Documents are used for this session's answers and are not saved to a project database.",
                         elem_classes=["study-note"],
                     )
 
@@ -269,24 +364,44 @@ def build_ui() -> gr.Blocks:
                     user_input = gr.Textbox(
                         elem_id="study-input",
                         lines=5,
+                        max_lines=12,
                         placeholder=(
-                            "Ask a question or paste a section of your notes…\n"
-                            "For example: Explain the key ideas in this chapter."
+                            "Ask a question or paste in a section of your notes…\n"
+                            "For example: Explain the key ideas in this chapter in simple terms."
                         ),
                         label="Your question or study material",
-                        show_label=True,
+                        show_label=False,
                     )
-                    submit_btn = gr.Button(
-                        "Study with AI  →",
-                        variant="primary",
-                        elem_id="study-send",
+                    gr.Examples(
+                        examples=[
+                            ["Explain photosynthesis in simple terms with an example."],
+                            ["Quiz me on the key ideas in my uploaded materials, one question at a time."],
+                            ["Summarize this topic into key points and definitions."],
+                        ],
+                        inputs=[user_input],
+                        label="Try an example",
                     )
+                    with gr.Row():
+                        submit_btn = gr.Button(
+                            "Study with AI  →",
+                            variant="primary",
+                            elem_id="study-send",
+                            scale=3,
+                        )
+                        clear_btn = gr.Button(
+                            "Clear",
+                            variant="secondary",
+                            elem_id="study-clear",
+                            scale=1,
+                        )
 
                 with gr.Group(elem_classes=["study-card"]):
-                    gr.Markdown("### ✨ Your study guide")
-                    output_box = gr.Markdown(
-                        "Your explanation, summary, quiz, or flashcards will appear here.",
-                        elem_id="study-answer",
+                    gr.Markdown("### ✨ Your study session")
+                    chat = gr.Chatbot(
+                        value=[{"role": "assistant", "content": WELCOME_MESSAGE}],
+                        height=360,
+                        show_label=False,
+                        elem_id="study-chatbot",
                     )
                     gr.Markdown(
                         "Responses are AI-generated study aids. Check important facts against your course materials.",
@@ -296,13 +411,28 @@ def build_ui() -> gr.Blocks:
         # Connect UI actions exclusively to the service layer function.
         submit_btn.click(
             fn=_respond,
-            inputs=[user_input, study_mode],
-            outputs=output_box,
+            inputs=[user_input, study_mode, document_library, chat],
+            outputs=[chat, user_input],
         )
         user_input.submit(
             fn=_respond,
-            inputs=[user_input, study_mode],
-            outputs=output_box,
+            inputs=[user_input, study_mode, document_library, chat],
+            outputs=[chat, user_input],
+        )
+        study_files.change(
+            fn=_load_materials,
+            inputs=study_files,
+            outputs=[document_status, document_library],
+        )
+        study_mode.change(
+            fn=_mode_description,
+            inputs=study_mode,
+            outputs=mode_help,
+        )
+        clear_btn.click(
+            fn=_clear_session,
+            inputs=None,
+            outputs=[user_input, chat],
         )
 
     return demo
