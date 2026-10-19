@@ -6,6 +6,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+evaluation/latest_run.json
 
 # Virtual environments & Conda
 .venv/

@@ -4,7 +4,7 @@ Systematic evaluation is essential for assessing whether your AI application rel
 
 ## How to Conduct Evaluation
 
-Students are expected to define and run manual or script-assisted evaluations against representative test cases.
+The repository contains model-independent service tests and a live evaluation runner for the configured Ollama model. The live runner records generated text and checks whether expected requests succeeded or failed; it does not automatically grade semantic quality.
 
 ### Test Case Categories
 
@@ -16,7 +16,8 @@ Your evaluation dataset in [`test_cases.json`](test_cases.json) should cover thr
 
 ## Evaluation Process
 
-1. **Define Test Cases:** Populate `test_cases.json` with realistic inputs and expected behaviors tailored to your user problem.
-2. **Execute System:** Run each test case through your application interface.
-3. **Log & Review:** Record `actual_result` and assign a `status` (`pass`, `fail`, `partial`).
-4. **Summarize Results:** Synthesize findings in [`evaluation_results.md`](evaluation_results.md).
+1. **Define Test Cases:** Maintain realistic inputs, study modes, expected behaviors, and expected service success in `test_cases.json`.
+2. **Run fast checks:** Execute `pytest` from the project root; tests use injected clients and do not need Ollama.
+3. **Run live cases:** Start Ollama with the configured model available, then execute `python -m evaluation.run_evaluation`. An optional `--output path.json` selects a report path.
+4. **Review results:** Inspect `evaluation/latest_run.json`. `pass`/`fail` checks service success behavior; successful model responses are marked `needs_review` until a person evaluates relevance, factuality, and adherence to the expected behavior.
+5. **Summarize findings:** Record the model, date, results, and limitations in [`evaluation_results.md`](evaluation_results.md). Do not report unrun cases or infer semantic quality from model-call success.

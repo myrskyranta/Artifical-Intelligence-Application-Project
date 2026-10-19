@@ -1,32 +1,27 @@
 # Evaluation Results Summary
 
-Document your team's evaluation results below.
+## Live integration run — 2026-10-19
 
-## Summary Overview
+- **Configured model:** `llama3.2` (Ollama)
+- **Cases executed:** 5
+- **Service behavior passed:** 1 (empty input rejected without contacting the model)
+- **Model responses awaiting semantic review:** 0
+- **Connection failures:** 4
 
-- **Date of Evaluation:** YYYY-MM-DD
-- **Model Evaluated:** (e.g., `llama3.2`)
-- **Total Test Cases Executed:** 0
-- **Passed:** 0
-- **Failed:** 0
-- **Pass Rate:** 0%
+Ollama was not reachable at the configured local endpoint during this run. The four model-backed cases therefore did not produce model outputs and are recorded as failed integration checks, not as evidence about model quality. Re-run `python -m evaluation.run_evaluation` after starting Ollama and pulling the configured model. The generated response report is written to the ignored `evaluation/latest_run.json` file.
 
-## Performance by Category
+| Category | Cases | Result |
+| :--- | :---: | :--- |
+| Successful study tasks | 2 | Both blocked by Ollama connection failure |
+| Difficult study tasks | 2 | Both blocked by Ollama connection failure |
+| Empty-input failure case | 1 | Passed; friendly validation response |
 
-| Category | Total Cases | Passed | Failed | Pass Rate |
-| :--- | :---: | :---: | :---: | :---: |
-| Successful Cases | 0 | 0 | 0 | 0% |
-| Difficult Cases | 0 | 0 | 0 | 0% |
-| Failure / Edge Cases | 0 | 0 | 0 | 0% |
+## Automated regression tests
 
-## Key Findings & Failure Analysis
+The service test suite passed **9 tests** with mocked model clients. This verifies validation, mode instructions, and service-level failures; it does not measure actual model quality.
 
-### What worked well
-- Observation 1
-- Observation 2
+## Findings and next steps
 
-### Observed failure modes
-- Description of case where the system failed and why.
-
-## Action Items & Improvements
-- [ ] Planned fix or enhancement based on evaluation findings.
+- Empty input is handled locally without a model request.
+- Local Ollama availability remains a runtime dependency and is surfaced with a friendly message.
+- Re-run the live cases with Ollama available, then manually grade factuality, relevance, and instruction-following before calling model-backed cases passes.

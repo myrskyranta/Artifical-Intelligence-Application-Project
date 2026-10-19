@@ -7,7 +7,7 @@ from src.models.model_client import (
     OllamaConnectionError,
     ModelNotFoundError,
 )
-from src.services.ai_service import AIService, generate_response
+from src.services.ai_service import AIService, generate_response, generate_study_response
 
 
 def test_config_loading():
@@ -71,3 +71,45 @@ def test_model_not_found_error_handling():
     assert response.success is False
     assert "configured AI model is unavailable" in response.content
     assert "llama3.2 not found" in response.error_message
+
+
+def test_study_mode_is_applied_in_service_layer():
+    mock_client = MagicMock()
+    mock_client.generate.return_value = "A concise explanation."
+    service = AIService(model_client=mock_client)
+
+    response = service.process_study_request("Photosynthesis", "Explain a concept")
+
+    assert response.success is True
+    prompt = mock_client.generate.call_args.args[0]
+    assert "step by step" in prompt
+    assert "Photosynthesis" in prompt
+
+
+def test_study_response_entry_point_returns_friendly_empty_input_message():
+    mock_client = MagicMock()
+    response = generate_study_response("  ", "Quiz me", service=AIService(mock_client))
+
+    assert "Please enter a message" in response
+    mock_client.generate.assert_not_called()
+
+
+def test_oversized_prompt_is_rejected_without_calling_model():
+    mock_client = MagicMock()
+    service = AIService(model_client=mock_client)
+
+    response = service.process_message("x" * (config.max_prompt_chars + 1))
+
+    assert response.success is False
+    assert "too long" in response.content
+    mock_client.generate.assert_not_called()
+
+
+def test_unexpected_model_error_is_controlled():
+    mock_client = MagicMock()
+    mock_client.generate.side_effect = ModelClientError("model crashed")
+    response = AIService(mock_client).process_message("Explain fractions")
+
+    assert response.success is False
+    assert "communication error" in response.content
+    assert "model crashed" in response.error_message

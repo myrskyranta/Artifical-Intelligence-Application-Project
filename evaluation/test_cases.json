@@ -2,25 +2,41 @@
   {
     "id": "case-01",
     "category": "successful_case",
-    "input": "Summarize the key objectives of this project in two sentences.",
-    "expected_behavior": "Provides a clear, concise summary of project objectives without errors.",
-    "actual_result": "",
-    "status": "pending"
+    "study_mode": "Summarize",
+    "input": "Summarize these notes in two sentences: Photosynthesis uses light energy to convert carbon dioxide and water into glucose and oxygen. Chlorophyll captures light, mainly in the leaves.",
+    "expected_behavior": "Produces a concise summary of the supplied notes in no more than two sentences; reviewer checks relevance and factuality.",
+    "expect_success": true
   },
   {
     "id": "case-02",
     "category": "difficult_case",
+    "study_mode": "Explain a concept",
     "input": "Explain how quantum computing works to a 5-year-old using simple analogies.",
-    "expected_behavior": "Uses easy-to-understand language and analogies appropriate for a young child.",
-    "actual_result": "",
-    "status": "pending"
+    "expected_behavior": "Uses simple language and a helpful analogy without presenting the analogy as exact physics.",
+    "expect_success": true
+  },
+  {
+    "id": "case-05",
+    "category": "successful_case",
+    "study_mode": "Quiz me",
+    "input": "I am studying the water cycle: evaporation, condensation, precipitation, and collection. Quiz me.",
+    "expected_behavior": "Starts with one relevant question and waits for the student's answer.",
+    "expect_success": true
+  },
+  {
+    "id": "case-04",
+    "category": "difficult_case",
+    "study_mode": "Make flashcards",
+    "input": "Create flashcards from these notes: Mitosis produces two genetically identical daughter cells. Meiosis produces four genetically diverse haploid cells. Both begin after DNA replication.",
+    "expected_behavior": "Creates accurate question-and-answer cards and preserves the key distinction between mitosis and meiosis.",
+    "expect_success": true
   },
   {
     "id": "case-03",
     "category": "failure_case",
+    "study_mode": "Study chat",
     "input": "",
     "expected_behavior": "Gracefully rejects empty input with a friendly user error message.",
-    "actual_result": "",
-    "status": "pending"
+    "expect_success": false
   }
 ]

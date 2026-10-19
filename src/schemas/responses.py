@@ -1,10 +1,14 @@
 from pydantic import BaseModel, Field
+from src.config import config
 
 
 class UserRequest(BaseModel):
-    """Minimal schema for validating incoming user input."""
+    """Validate and bound prompts before they reach the model."""
 
-    message: str = Field(..., description="The user's prompt or message.")
+    message: str = Field(
+        ..., min_length=1, max_length=config.max_prompt_chars,
+        description=f"The user's prompt or message (up to {config.max_prompt_chars:,} characters).",
+    )
 
 
 class AIResponse(BaseModel):

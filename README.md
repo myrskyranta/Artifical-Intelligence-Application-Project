@@ -1,6 +1,6 @@
 # StudyBuddy AI
 
-Starter template for the **Development of AI Applications** course final group project.
+StudyBuddy AI is a local-first study assistant for Häme University of Applied Sciences students. It uses an Ollama-hosted language model to explain concepts, summarize pasted notes, create practice quizzes, and draft flashcards.
 
 ## Team members
 
@@ -21,7 +21,7 @@ This project requires AI and LLM's (Large Language Models) because studying is s
 
 ## Solution
 
-StudyBuddy AI addresses the challenges stated above by providing a centralized studying assistant. It combines Retrieval-Augmented Generation (RAG) and user-friendly interface and allows students to upload their course materials and instantly generate accurate explanations, practice quizzes as well as interactive flashcards. This reduces preparation time significantly and improves retention.
+StudyBuddy AI provides a focused interface for working with course material pasted by the student. Study modes add task-specific instructions before the application sends the prompt to a locally running Ollama model. This version does not upload files, store a course library, retain conversation history, or implement RAG; students should verify generated content against their course sources.
 
 ## Main user workflow
 
@@ -49,27 +49,28 @@ Ollama (Local LLM Server)
 
 ## Model
 
-- **Model used:** e.g., `llama3.2` (or specified local Ollama model)
-- **Selection rationale:** Why was this specific model chosen for your project (e.g., lightweight, performance, context size)?
+- **Model used by default:** Meta Llama 3.2 (`llama3.2`) served locally through Ollama; override with `MODEL_NAME`.
+- **Selection rationale:** A compact instruction-tuned model is practical for local inference on student hardware and keeps study prompts on the user's machine. Response quality and speed depend on the selected model and available hardware.
+- **Model interaction:** The Ollama Python client sends chat prompts with a configurable timeout; failures and missing models are returned as friendly application messages.
 
 ## Additional AI capability
 
-Select at least one additional capability to implement for your final project:
+Implemented capability:
 
-- [ ] RAG (Retrieval-Augmented Generation)
+- [ ] RAG (Retrieval-Augmented Generation; planned, not implemented)
 - [ ] Tools / External API integration
 - [ ] Model Context Protocol (MCP)
 - [ ] Agentic workflow (Model-selected actions based on observations)
 - [ ] Memory / Persistent state
 - [ ] Multimodal interaction (Text + Images)
-- [ ] Other: ______________________
+- [x] Other: Task-specific study modes (explain, quiz, summarize, and flashcards)
 
 ### Capability justification
-Retrieval-Augmented Generation (RAG) is useful in this project because it directly solves the core limitations of standard AI when applied to academics. For example, it eliminates the risk of hallucination with source grounding. RAG retrieves exact excerpts from the materials that the user has uploaded and then feeds those excerpts to the AI as context. This then forces the model to answer using only the verified materials, ensuring factual accuracy.
+Task-specific study modes make the same model useful for different learning activities while keeping prompt construction in the application service rather than the UI. RAG remains a future improvement: this release has no upload, indexing, or retrieval pipeline, and prompting alone cannot guarantee factual accuracy.
 
 ## Setup
 
-### 1. Create the Conda environment
+### 1. Create the Conda environment (Python 3.12)
 
 ```bash
 conda env create -f environment.yml
@@ -81,7 +82,7 @@ conda env create -f environment.yml
 conda activate dev-ai-project
 ```
 
-### 3. Configure environment variables
+### 3. Configure environment variables (optional)
 
 Copy `.env.example` to create your local `.env` configuration file:
 
@@ -95,29 +96,37 @@ On Windows (Command Prompt / PowerShell):
 copy .env.example .env
 ```
 
-Ensure `.env` contains valid values for `OLLAMA_BASE_URL` and `MODEL_NAME`:
+Defaults work for a standard local Ollama installation. To customize, set values in `.env`:
 ```env
 OLLAMA_BASE_URL=http://localhost:11434
 MODEL_NAME=llama3.2
+MODEL_TIMEOUT_SECONDS=120
+MAX_PROMPT_CHARS=16000
 ```
+
+`MODEL_TIMEOUT_SECONDS` bounds each model request. `MAX_PROMPT_CHARS` rejects excessively large prompts before inference.
 
 ### 4. Start Ollama
 
 Make sure Ollama is installed and running locally, then pull your configured model:
 
 ```bash
-ollama run llama3.2
+ollama pull llama3.2
 ```
+
+Ollama must remain running in the background. If you selected another model, pull that model instead.
 
 ### 5. Run the application
 
-Run the application from the root directory of the project:
+From the repository root, launch the application:
 
 ```bash
 python -m app.main
 ```
 
 Then open your browser at `http://localhost:7860`.
+
+The UI delegates study prompts to the application service; only the model client communicates with Ollama. Requests and inference are local by default, but the model provider and local Ollama deployment still determine data handling.
 
 ### 6. Run automated tests
 
@@ -127,13 +136,15 @@ pytest
 
 ## Evaluation
 
-Describe your evaluation methodology and summarize key results. Starter test cases can be found in [`evaluation/test_cases.json`](evaluation/test_cases.json).
+Run fast, model-independent regression tests with `pytest`. For live evaluation against the configured Ollama model, run `python -m evaluation.run_evaluation`; the script saves actual responses and connection-level results to `evaluation/latest_run.json`. Review the outputs manually for relevance, factuality, age-appropriateness, and instruction-following; successful inference is not a semantic-quality pass.
 
 Refer to [`evaluation/README.md`](evaluation/README.md) for guidelines on defining success, edge cases, and failure scenarios.
 
 ## Known limitations
 
-- Highlight known system limitations, unhandled edge cases, or boundaries of current capabilities.
+- No file upload, persistent course library, retrieval-augmented generation, or multi-turn conversation memory.
+- Model responses can be incorrect or inconsistent; verify important facts with course materials.
+- Local inference speed and quality depend on the selected model and device.
 
 ## Future improvements
 

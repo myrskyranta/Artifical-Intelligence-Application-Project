@@ -24,7 +24,10 @@ class OllamaModelClient:
     def __init__(self, base_url: Optional[str] = None, model_name: Optional[str] = None):
         self.base_url = base_url or config.ollama_base_url
         self.model_name = model_name or config.model_name
-        self._client = ollama.Client(host=self.base_url)
+        self._client = ollama.Client(
+            host=self.base_url,
+            timeout=config.model_timeout_seconds,
+        )
 
     def generate(self, prompt: str) -> str:
         """
@@ -38,22 +41,34 @@ class OllamaModelClient:
                 messages=[{"role": "user", "content": prompt}],
             )
             
-            # Standardize extraction from dict or chat response object
+            # Standardize extraction from dict or chat response object.
             if isinstance(response, dict):
-                return response.get("message", {}).get("content", "")
+                message = response.get("message") or {}
+                content = message.get("content", "") if isinstance(message, dict) else ""
             elif hasattr(response, "message") and hasattr(response.message, "content"):
-                return response.message.content
-            return str(response)
+                content = response.message.content
+            else:
+                content = ""
+
+            if not isinstance(content, str) or not content.strip():
+                raise ModelClientError("The model returned an empty response.")
+            return content.strip()
 
         except Exception as err:
+            if isinstance(err, ModelClientError):
+                raise
             err_str = str(err).lower()
-            if "connection" in err_str or "connect" in err_str or "refused" in err_str:
-                raise OllamaConnectionError(
-                    f"Failed to connect to Ollama service at {self.base_url}."
-                ) from err
-            elif "not found" in err_str or "404" in err_str:
+            status_code = getattr(err, "status_code", None)
+            if status_code == 404 or "model" in err_str and ("not found" in err_str or "pull" in err_str):
                 raise ModelNotFoundError(
                     f"Model '{self.model_name}' is not installed in local Ollama."
                 ) from err
-            else:
-                raise ModelClientError(f"Error communicating with Ollama: {err}") from err
+            if (
+                isinstance(err, (ConnectionError, TimeoutError))
+                or any(term in err_str for term in ("connection", "connect", "refused", "timed out", "timeout"))
+            ):
+                raise OllamaConnectionError(
+                    f"Could not reach Ollama at {self.base_url} within "
+                    f"{config.model_timeout_seconds:g} seconds."
+                ) from err
+            raise ModelClientError(f"Error communicating with Ollama: {err}") from err
