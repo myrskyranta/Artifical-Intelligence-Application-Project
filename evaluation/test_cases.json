@@ -38,5 +38,124 @@
     "input": "",
     "expected_behavior": "Gracefully rejects empty input with a friendly user error message.",
     "expect_success": false
+  },
+  {
+    "id": "rag-01",
+    "category": "rag_answerable",
+    "study_mode": "Explain a concept",
+    "use_documents": true,
+    "input": "What does grounding mean?",
+    "expected_keywords": ["grounding means", "evidence"],
+    "expected_behavior": "Explains that grounding ties an answer to supplied evidence so it can be checked; cites sample_course_notes.md.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-02",
+    "category": "rag_answerable",
+    "study_mode": "Study chat",
+    "use_documents": true,
+    "input": "How many dimensions do the all-MiniLM-L6-v2 embeddings have?",
+    "expected_keywords": ["384"],
+    "expected_behavior": "Answers 384 dimensions, taken from the notes.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-03",
+    "category": "rag_answerable",
+    "study_mode": "Explain a concept",
+    "use_documents": true,
+    "input": "How is cosine distance calculated in Chroma?",
+    "expected_keywords": ["one minus cosine similarity"],
+    "expected_behavior": "States that cosine distance is one minus cosine similarity and that a smaller distance means a closer match.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-04",
+    "category": "rag_answerable",
+    "study_mode": "Summarize",
+    "use_documents": true,
+    "input": "Summarize the steps of ingestion.",
+    "expected_keywords": ["ingestion is the preparation pipeline"],
+    "expected_behavior": "Lists the five steps in order: extract text, identify source, chunk, create embeddings, store records.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-05",
+    "category": "rag_answerable",
+    "study_mode": "Make flashcards",
+    "use_documents": true,
+    "input": "Make flashcards about chunk overlap and fixed windows.",
+    "expected_keywords": ["overlap", "80-word"],
+    "expected_behavior": "Creates accurate cards on fixed windows and overlap (e.g. 80-word windows with 15 shared words) without adding facts that are not in the notes.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-06",
+    "category": "rag_paraphrased",
+    "study_mode": "Study chat",
+    "use_documents": true,
+    "input": "Why is it a bad idea to cut the text into very small pieces?",
+    "expected_keywords": ["short chunks"],
+    "expected_behavior": "Explains that short chunks can lose the heading or a condition. The question avoids the word 'chunk', so this tests keyword-based (BM25) retrieval on paraphrased wording.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-07",
+    "category": "rag_paraphrased",
+    "study_mode": "Explain a concept",
+    "use_documents": true,
+    "input": "How is putting new documents into the system different from retraining the model?",
+    "expected_keywords": ["learned parameters"],
+    "expected_behavior": "Explains that adding documents changes the searchable collection while training changes the model's learned parameters.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-08",
+    "category": "rag_answerable",
+    "study_mode": "Quiz me",
+    "use_documents": true,
+    "input": "Quiz me on similarity and ranking.",
+    "expected_keywords": ["ranking signal"],
+    "expected_behavior": "Asks one question based on the similarity and ranking section and waits for the answer.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-09",
+    "category": "rag_unanswerable",
+    "study_mode": "Study chat",
+    "use_documents": true,
+    "input": "What is the exam date for this course?",
+    "expected_keywords": [],
+    "expected_behavior": "Says the uploaded notes do not contain an exam date and does not invent one.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-10",
+    "category": "rag_unanswerable",
+    "study_mode": "Study chat",
+    "use_documents": true,
+    "input": "Who won the 2022 FIFA World Cup?",
+    "expected_keywords": [],
+    "expected_behavior": "Says the question is not covered by the uploaded notes instead of answering from general knowledge as if it came from the material.",
+    "expect_success": true
+  },
+  {
+    "id": "rag-11",
+    "category": "failure_case",
+    "study_mode": "Study chat",
+    "use_documents": true,
+    "input": "   ",
+    "expected_behavior": "Rejects whitespace-only input with a friendly message without calling the model.",
+    "expect_success": false
+  },
+  {
+    "id": "rag-12",
+    "category": "failure_case",
+    "study_mode": "Explain a concept",
+    "use_documents": true,
+    "input": "Explain chunking again in more detail please. ",
+    "input_repeat": 400,
+    "expected_behavior": "Rejects a request longer than MAX_PROMPT_CHARS (16,000) with a friendly message without calling the model.",
+    "expect_success": false
   }
 ]
