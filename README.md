@@ -14,7 +14,7 @@ StudyBuddy AI is a local-first study assistant for Häme University of Applied S
 - **Md Firoz Chowdhury** — RAG evaluation: sample course notes, 12 evaluation cases, automatic retrieval checks, live evaluation run and results analysis; updated the decision log.
 - **Bishnu Chaudhary** — Review.
 
-- Github Project link: https://github.com/myrskyranta/Artifical-Intelligence-Application-Project
+- GitHub Project link: https://github.com/myrskyranta/Artifical-Intelligence-Application-Project
 
 
 ## Problem
@@ -26,7 +26,7 @@ Students of Häme University of Applied Sciences.
 Students face a lot of scheduling conflicts in their studies due to a large amount of projects, assignments and materials to study. Manually making flashcards, practice quizzes and summaries for one's studies takes away hours that the student could use more efficiently. 
 
 ### Why AI is appropriate
-This project requires AI and LLM's (Large Language Models) because studying is semantic, creative and unstructured and traditional deterministic software, e.g. databases or keyword search engines, rely on rules, exact matches and structured data. Traditional software works great in storing data and organizing it but AI is required to comprehend and synthesize and generate knowledge from said data. Without AI, this project's application would only be an expensive document storage solution rather than a usable study planner.
+This project requires AI and LLMs (Large Language Models) because studying is semantic, creative and unstructured and traditional deterministic software, e.g. databases or keyword search engines, rely on rules, exact matches and structured data. Traditional software works great in storing data and organizing it but AI is required to comprehend and synthesize and generate knowledge from said data. Without AI, this project's application would only be an expensive document storage solution rather than a usable study planner.
 
 ## Solution
 
@@ -79,8 +79,6 @@ Implemented capability:
 StudyBuddy implements lightweight RAG for uploaded course materials. It extracts and chunks text from TXT, Markdown, PDF, and DOCX files, ranks relevant chunks for each request, and passes them to the model through the AI service with source labels and grounding instructions. This encourages document-based answers but cannot eliminate hallucinations, so students should verify important information against the cited material.
 
 Uploads are held for the active Gradio session and are not saved to a project database. Scanned PDFs without selectable text are not supported because OCR is not included.
-
-Task-specific study modes and session conversation history support continued explanations and quiz turns while keeping prompt construction in the application service rather than the UI.
 
 ## Technologies
 
@@ -160,7 +158,7 @@ StudyBuddy's RAG works mainly in 2 steps, one is Retrieval to search relevant te
 
 ### 2. Method
 
-- Specific Documents (data/sample_course_notes.md), Collected from the course's website chapter 4, called (Grounding and RAG), as summary made by AI based on this page's content- https://mazarbaloch.github.io/dev-ai-course/docs/chapters/04-grounding-and-rag
+- Specific Documents (data/sample_course_notes.md), Based on the course's website chapter 4, called (Grounding and RAG), as summary made by AI based on this page's content- https://mazarbaloch.github.io/dev-ai-course/docs/chapters/04-grounding-and-rag
 
 - 17 Test Cases (evaluation/test_cases.json)
 
