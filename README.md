@@ -12,7 +12,7 @@ StudyBuddy AI is a local-first study assistant for Häme University of Applied S
 
 - **Emmi Myrskyranta** — Built the core application: Gradio UI, RAG retrieval, AI service, automated tests and initial documentation.
 - **Md Firoz Chowdhury** — RAG evaluation: sample course notes, 12 evaluation cases, automatic retrieval checks, live evaluation run and results analysis; updated the decision log.
-- **Bishnu Chaudhary** — Review.
+- **Bishnu Chaudhary** — Application review, Ollama connection testing, and development support. Developed a standalone Python script to verify   the Ollama server connection, check installed AI models, and handle connection errors. Performed positive and negative tests to confirm the reliability of the tool. Documented testing results and improved project setup guidance.
 
 - GitHub Project link: https://github.com/myrskyranta/Artifical-Intelligence-Application-Project
 
