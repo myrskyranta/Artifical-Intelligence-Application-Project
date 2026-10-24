@@ -12,7 +12,7 @@ StudyBuddy AI is a local-first study assistant for Häme University of Applied S
 
 - **Emmi Myrskyranta** — Built the core application: Gradio UI, RAG retrieval, AI service, automated tests and initial documentation.
 - **Md Firoz Chowdhury** — RAG evaluation: sample course notes, 12 evaluation cases, automatic retrieval checks, live evaluation run and results analysis; updated the decision log.
-- **Bishnu Chaudhary** — Review.
+- **Bishnu Chaudhary** — Application review, Ollama connection testing, and development support. Developed a standalone Python script to verify   the Ollama server connection, check installed AI models, and handle connection errors. Performed positive and negative tests to confirm the reliability of the tool. Documented testing results and improved project setup guidance.
 
 - GitHub Project link: https://github.com/myrskyranta/Artifical-Intelligence-Application-Project
 
@@ -247,3 +247,49 @@ Results are saved to `evaluation/latest_run.json` (not committed to Git).
 ## Recorded presentation
 
 Video: (link to be added)
+
+
+
+## Ollama Connection Checker
+
+As part of the application review and testing process, a standalone Python-based Ollama Connection Checker was developed by **Bishnu Chaudhary**.
+
+The purpose of this tool is to verify that the local Ollama environment is properly configured before running StudyBuddy AI.
+
+### Features
+
+- Checks whether the Ollama server is running.
+- Connects to the local Ollama API.
+- Displays available AI models.
+- Verifies whether the required Llama 3.2 model is installed.
+- Provides clear error messages when the server or model is unavailable.
+- Runs independently without modifying the main application.
+
+### How to Run
+
+Activate the project's Python environment and run the checker from the project root:
+
+```powershell
+python scripts/check_ollama.py
+```
+
+### Testing and Validation
+
+The following tests were completed:
+
+| Test ID | Description | Result |
+|---|---|---|
+| TC01 | Connect to Ollama using port 11434 | PASS |
+| TC02 | Verify the required Llama 3.2 model | PASS |
+| TC03 | Display locally installed AI models | PASS |
+| TC04 | Detect an unavailable Ollama server using port 11435 | PASS |
+
+During testing, the script successfully detected `llama3.2:latest` and `llama3.2:3b`.
+
+A negative test was also performed using an incorrect server port. The script correctly displayed a connection error instead of crashing unexpectedly.
+
+### Contribution to the Project
+
+This diagnostic tool provides a simple method for developers to check their local Ollama setup and troubleshoot connection problems.
+
+The checker is implemented separately from the existing AI application and does not modify the RAG pipeline, Gradio user interface, or AI service.
