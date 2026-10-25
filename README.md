@@ -244,9 +244,6 @@ Results are saved to `evaluation/latest_run.json` (not committed to Git).
 - Show the retrieved sources in the UI instead of relying on model citations.
 - Add embedding-based or hybrid retrieval for paraphrased questions.
 
-## Recorded presentation
-
-Video: (link to be added)
 
 
 
@@ -293,3 +290,15 @@ A negative test was also performed using an incorrect server port. The script co
 This diagnostic tool provides a simple method for developers to check their local Ollama setup and troubleshoot connection problems.
 
 The checker is implemented separately from the existing AI application and does not modify the RAG pipeline, Gradio user interface, or AI service.
+
+
+## Recorded presentation
+
+
+**Full group presentation (≈12 min):** https://drive.google.com/file/d/1Z2GP8tlDb0z7x5xjhF30JHS4v2wqm6_z/view
+
+Individual parts:
+- Emmi Myrskyranta: https://drive.google.com/file/d/104rTWxREd5TrEcKwM_A5-Yq2LSofvx9a/view?usp=sharing
+- Md Firoz Chowdhury: https://drive.google.com/file/d/1ykOKuvwJP6Ll7Sp7-3s_Y6A-wcvnkW8y/view?usp=sharing
+- Bishnu Chaudhary: https://drive.google.com/file/d/1E1LhxS8BWXJO56PFmhsJIidl8j7T68k3/view?usp=sharing
+
